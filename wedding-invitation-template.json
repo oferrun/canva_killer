@@ -1,0 +1,186 @@
+{
+  "template_id": "wedding_invitation_template_001",
+  "template_name": "Classic Wedding Invitation",
+  "canvas": {
+    "width": 800,
+    "height": 1200
+  },
+  "elements": [
+    {
+      "element_id": "background",
+      "element_type": "shape",
+      "shape_type": "rectangle",
+      "style": {
+        "width": "100%",
+        "height": "100%",
+        "fill": "background_primary",
+        "border": "none"
+      }
+    },
+    {
+      "element_id": "top_border",
+      "element_type": "shape",
+      "shape_type": "rectangle",
+      "style": {
+        "width": "90%",
+        "height": "2px",
+        "margin_top": "80px",
+        "margin_left": "5%",
+        "fill": "accent_gold",
+        "border": "none"
+      }
+    },
+    {
+      "element_id": "decorative_top",
+      "element_type": "data_item",
+      "data_item_id": "decorative_image",
+      "style": {
+        "width": "200px",
+        "height": "150px",
+        "margin_top": "100px",
+        "margin_left": "auto",
+        "margin_right": "auto",
+        "display": "block"
+      }
+    },
+    {
+      "element_id": "header_text",
+      "element_type": "data_item",
+      "data_item_id": "invitation_header",
+      "style": {
+        "font": "serif_secondary",
+        "font_size": "18px",
+        "text_align": "center",
+        "color": "text_secondary",
+        "margin_top": "40px",
+        "letter_spacing": "2px",
+        "text_transform": "uppercase"
+      }
+    },
+    {
+      "element_id": "couple_names_display",
+      "element_type": "data_item",
+      "data_item_id": "couple_names",
+      "style": {
+        "font": "script_primary",
+        "font_size": "64px",
+        "text_align": "center",
+        "color": "text_primary",
+        "margin_top": "30px",
+        "line_height": "1.2"
+      }
+    },
+    {
+      "element_id": "invitation_message",
+      "element_type": "data_item",
+      "data_item_id": "invitation_text",
+      "style": {
+        "font": "serif_secondary",
+        "font_size": "20px",
+        "text_align": "center",
+        "color": "text_secondary",
+        "margin_top": "25px",
+        "letter_spacing": "1px"
+      }
+    },
+    {
+      "element_id": "divider",
+      "element_type": "shape",
+      "shape_type": "circle",
+      "style": {
+        "width": "8px",
+        "height": "8px",
+        "margin_top": "40px",
+        "margin_left": "auto",
+        "margin_right": "auto",
+        "fill": "accent_gold",
+        "border": "none"
+      }
+    },
+    {
+      "element_id": "date_display",
+      "element_type": "data_item",
+      "data_item_id": "wedding_date",
+      "style": {
+        "font": "serif_primary",
+        "font_size": "28px",
+        "text_align": "center",
+        "color": "text_primary",
+        "margin_top": "40px",
+        "font_weight": "600"
+      }
+    },
+    {
+      "element_id": "time_display",
+      "element_type": "data_item",
+      "data_item_id": "wedding_time",
+      "style": {
+        "font": "serif_secondary",
+        "font_size": "20px",
+        "text_align": "center",
+        "color": "text_secondary",
+        "margin_top": "15px"
+      }
+    },
+    {
+      "element_id": "venue_container",
+      "element_type": "container",
+      "style": {
+        "margin_top": "50px",
+        "padding": "30px"
+      },
+      "children": [
+        {
+          "element_id": "venue_name_display",
+          "element_type": "data_item",
+          "data_item_id": "venue_name",
+          "style": {
+            "font": "serif_primary",
+            "font_size": "24px",
+            "text_align": "center",
+            "color": "text_primary",
+            "font_weight": "600"
+          }
+        },
+        {
+          "element_id": "venue_address_display",
+          "element_type": "data_item",
+          "data_item_id": "venue_address",
+          "style": {
+            "font": "serif_secondary",
+            "font_size": "18px",
+            "text_align": "center",
+            "color": "text_secondary",
+            "margin_top": "10px"
+          }
+        }
+      ]
+    },
+    {
+      "element_id": "bottom_border",
+      "element_type": "shape",
+      "shape_type": "rectangle",
+      "style": {
+        "width": "90%",
+        "height": "2px",
+        "margin_top": "60px",
+        "margin_left": "5%",
+        "fill": "accent_gold",
+        "border": "none"
+      }
+    },
+    {
+      "element_id": "rsvp_display",
+      "element_type": "data_item",
+      "data_item_id": "rsvp_text",
+      "style": {
+        "font": "serif_secondary",
+        "font_size": "16px",
+        "text_align": "center",
+        "color": "text_tertiary",
+        "margin_top": "40px",
+        "font_style": "italic"
+      }
+    }
+  ]
+}

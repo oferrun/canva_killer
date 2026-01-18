@@ -1,0 +1,92 @@
+{
+  "theme_id": "elegant_wedding_theme_001",
+  "theme_name": "Elegant Wedding Theme",
+  "color_palette": [
+    {
+      "id": "background_primary",
+      "name": "Cream White",
+      "r": 252,
+      "g": 248,
+      "b": 243,
+      "a": 1.0
+    },
+    {
+      "id": "text_primary",
+      "name": "Charcoal",
+      "r": 45,
+      "g": 45,
+      "b": 45,
+      "a": 1.0
+    },
+    {
+      "id": "text_secondary",
+      "name": "Warm Gray",
+      "r": 102,
+      "g": 102,
+      "b": 102,
+      "a": 1.0
+    },
+    {
+      "id": "text_tertiary",
+      "name": "Light Gray",
+      "r": 140,
+      "g": 140,
+      "b": 140,
+      "a": 1.0
+    },
+    {
+      "id": "accent_gold",
+      "name": "Rose Gold",
+      "r": 183,
+      "g": 110,
+      "b": 121,
+      "a": 1.0
+    },
+    {
+      "id": "accent_light",
+      "name": "Blush Pink",
+      "r": 245,
+      "g": 222,
+      "b": 224,
+      "a": 1.0
+    },
+    {
+      "id": "accent_dark",
+      "name": "Deep Rose",
+      "r": 142,
+      "g": 78,
+      "b": 93,
+      "a": 1.0
+    },
+    {
+      "id": "border_color",
+      "name": "Soft Beige",
+      "r": 220,
+      "g": 210,
+      "b": 200,
+      "a": 1.0
+    }
+  ],
+  "font_palette": [
+    {
+      "font_id": "script_primary",
+      "font_name": "Great Vibes",
+      "font_url": "https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
+    },
+    {
+      "font_id": "serif_primary",
+      "font_name": "Playfair Display",
+      "font_url": "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap"
+    },
+    {
+      "font_id": "serif_secondary",
+      "font_name": "Cormorant Garamond",
+      "font_url": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap"
+    },
+    {
+      "font_id": "sans_primary",
+      "font_name": "Montserrat",
+      "font_url": "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap"
+    }
+  ]
+}

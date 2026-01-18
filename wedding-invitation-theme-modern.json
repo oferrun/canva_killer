@@ -1,0 +1,92 @@
+{
+  "theme_id": "modern_wedding_theme_001",
+  "theme_name": "Modern Bold Wedding Theme",
+  "color_palette": [
+    {
+      "id": "background_primary",
+      "name": "Deep Navy",
+      "r": 26,
+      "g": 35,
+      "b": 53,
+      "a": 1.0
+    },
+    {
+      "id": "text_primary",
+      "name": "Pure White",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 1.0
+    },
+    {
+      "id": "text_secondary",
+      "name": "Soft Silver",
+      "r": 200,
+      "g": 205,
+      "b": 210,
+      "a": 1.0
+    },
+    {
+      "id": "text_tertiary",
+      "name": "Muted Blue",
+      "r": 150,
+      "g": 165,
+      "b": 180,
+      "a": 1.0
+    },
+    {
+      "id": "accent_gold",
+      "name": "Electric Coral",
+      "r": 255,
+      "g": 111,
+      "b": 97,
+      "a": 1.0
+    },
+    {
+      "id": "accent_light",
+      "name": "Soft Peach",
+      "r": 255,
+      "g": 193,
+      "b": 180,
+      "a": 1.0
+    },
+    {
+      "id": "accent_dark",
+      "name": "Deep Coral",
+      "r": 220,
+      "g": 70,
+      "b": 60,
+      "a": 1.0
+    },
+    {
+      "id": "border_color",
+      "name": "Steel Blue",
+      "r": 70,
+      "g": 85,
+      "b": 105,
+      "a": 1.0
+    }
+  ],
+  "font_palette": [
+    {
+      "font_id": "script_primary",
+      "font_name": "Allura",
+      "font_url": "https://fonts.googleapis.com/css2?family=Allura&display=swap"
+    },
+    {
+      "font_id": "serif_primary",
+      "font_name": "Abril Fatface",
+      "font_url": "https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap"
+    },
+    {
+      "font_id": "serif_secondary",
+      "font_name": "Lora",
+      "font_url": "https://fonts.googleapis.com/css2?family=Lora:wght@400;600&display=swap"
+    },
+    {
+      "font_id": "sans_primary",
+      "font_name": "Raleway",
+      "font_url": "https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap"
+    }
+  ]
+}

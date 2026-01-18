@@ -1,0 +1,59 @@
+{
+  "scene_id": "wedding_invitation_001",
+  "data_items": [
+    {
+      "id": "couple_names",
+      "type": "text",
+      "display_name": "Couple Names",
+      "content": "Sarah & Michael"
+    },
+    {
+      "id": "invitation_header",
+      "type": "text",
+      "display_name": "Invitation Header",
+      "content": "Together with their families"
+    },
+    {
+      "id": "invitation_text",
+      "type": "text",
+      "display_name": "Invitation Text",
+      "content": "request the honor of your presence at their wedding"
+    },
+    {
+      "id": "wedding_date",
+      "type": "text",
+      "display_name": "Wedding Date",
+      "content": "Saturday, June 15th, 2026"
+    },
+    {
+      "id": "wedding_time",
+      "type": "text",
+      "display_name": "Wedding Time",
+      "content": "4:00 in the afternoon"
+    },
+    {
+      "id": "venue_name",
+      "type": "text",
+      "display_name": "Venue Name",
+      "content": "The Garden Estate"
+    },
+    {
+      "id": "venue_address",
+      "type": "text",
+      "display_name": "Venue Address",
+      "content": "123 Rose Garden Lane, Bloomfield"
+    },
+    {
+      "id": "rsvp_text",
+      "type": "text",
+      "display_name": "RSVP Text",
+      "content": "Please reply by May 1st, 2026"
+    },
+    {
+      "id": "decorative_image",
+      "type": "image",
+      "display_name": "Decorative Floral Image",
+      "image_url": "https://example.com/floral-decoration.png"
+    }
+  ]
+}
