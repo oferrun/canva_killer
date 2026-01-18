@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scene Editor</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #f5f5f5;
+    }
+    .app-container {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Left Panel - Controls */
+    .left-panel {
+      width: 400px;
+      min-width: 400px;
+      padding: 20px;
+      overflow-y: auto;
+      border-right: 1px solid #ddd;
+      background: #fff;
+    }
+    h1 {
+      margin: 0 0 20px 0;
+      font-size: 24px;
+    }
+
+    /* Right Panel - Preview */
+    .right-panel {
+      flex: 1;
+      padding: 20px;
+      overflow: auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      background: #e5e5e5;
+    }
+    .preview-container {
+      background: white;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .preview-container.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 400px;
+      height: 300px;
+      color: #999;
+      font-size: 16px;
+    }
+    #previewFrame {
+      border: none;
+      display: block;
+    }
+
+    /* Status */
+    .status-container {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .status-left {
+      display: flex;
+      align-items: center;
+    }
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .status-indicator.connected { background: #22c55e; }
+    .status-indicator.disconnected { background: #ef4444; }
+    .status-indicator.connecting { background: #f59e0b; }
+    .status-text {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .scene-name {
+      font-size: 12px;
+      color: #666;
+    }
+
+    /* Drop Zone */
+    .drop-zone {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 25px;
+      text-align: center;
+      background: #fafafa;
+      margin-bottom: 15px;
+      transition: all 0.2s;
+    }
+    .drop-zone.drag-over {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+    .drop-zone h2 {
+      margin: 0 0 5px 0;
+      font-size: 16px;
+      color: #333;
+    }
+    .drop-zone p {
+      margin: 0;
+      color: #666;
+      font-size: 13px;
+    }
+
+    /* Component Cards */
+    .component-card {
+      background: #fafafa;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      border: 1px solid #eee;
+    }
+    .component-header {
+      padding: 10px 12px;
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .component-header.data { background: #dbeafe; color: #1e40af; }
+    .component-header.template { background: #dcfce7; color: #166534; }
+    .component-header.theme { background: #fef3c7; color: #92400e; }
+    .component-file {
+      font-size: 11px;
+      font-weight: normal;
+      color: #666;
+    }
+    .component-drop {
+      padding: 12px;
+      min-height: 60px;
+      border: 2px dashed transparent;
+      transition: all 0.2s;
+    }
+    .component-drop.drag-over {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+    .component-drop.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 12px;
+    }
+    .component-content {
+      background: #fff;
+      border-radius: 4px;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 10px;
+      max-height: 100px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      border: 1px solid #eee;
+    }
+
+    /* Messages */
+    .messages {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 10px;
+      max-height: 120px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+    }
+    .messages h3 {
+      margin: 0 0 8px 0;
+      font-size: 12px;
+      color: #666;
+    }
+    .message {
+      padding: 4px 8px;
+      margin: 3px 0;
+      background: #fff;
+      border-radius: 3px;
+      font-size: 10px;
+      font-family: monospace;
+      border: 1px solid #eee;
+    }
+    .message.sent { background: #dbeafe; border-color: #bfdbfe; }
+    .message.received { background: #dcfce7; border-color: #bbf7d0; }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Left Panel: Controls -->
+    <div class="left-panel">
+      <h1>Scene Editor</h1>
+
+      <div class="status-container">
+        <div class="status-left">
+          <span id="statusIndicator" class="status-indicator connecting"></span>
+          <span id="statusText" class="status-text">Connecting...</span>
+        </div>
+        <span id="sceneName" class="scene-name">No scene loaded</span>
+      </div>
+
+      <div id="mainDropZone" class="drop-zone">
+        <h2>Drop Scene File Here</h2>
+        <p>Drag and drop a scene JSON file to load it</p>
+      </div>
+
+      <div class="component-card">
+        <div class="component-header data">
+          Data
+          <span id="dataFile" class="component-file">-</span>
+        </div>
+        <div id="dataDropZone" class="component-drop empty" data-type="data">
+          Drop data JSON here
+        </div>
+      </div>
+
+      <div class="component-card">
+        <div class="component-header template">
+          Template
+          <span id="templateFile" class="component-file">-</span>
+        </div>
+        <div id="templateDropZone" class="component-drop empty" data-type="template">
+          Drop template JSON here
+        </div>
+      </div>
+
+      <div class="component-card">
+        <div class="component-header theme">
+          Theme
+          <span id="themeFile" class="component-file">-</span>
+        </div>
+        <div id="themeDropZone" class="component-drop empty" data-type="theme">
+          Drop theme JSON here
+        </div>
+      </div>
+
+      <div class="messages" id="messages">
+        <h3>Messages</h3>
+      </div>
+    </div>
+
+    <!-- Right Panel: Preview -->
+    <div class="right-panel">
+      <div id="previewContainer" class="preview-container empty">
+        Drop a scene file to preview
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const statusIndicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    const sceneName = document.getElementById('sceneName');
+    const messagesContainer = document.getElementById('messages');
+    const mainDropZone = document.getElementById('mainDropZone');
+    const previewContainer = document.getElementById('previewContainer');
+
+    const componentDropZones = {
+      data: document.getElementById('dataDropZone'),
+      template: document.getElementById('templateDropZone'),
+      theme: document.getElementById('themeDropZone')
+    };
+
+    const componentFiles = {
+      data: document.getElementById('dataFile'),
+      template: document.getElementById('templateFile'),
+      theme: document.getElementById('themeFile')
+    };
+
+    let ws = null;
+    let currentScene = null;
+
+    function updateStatus(status) {
+      statusIndicator.className = `status-indicator ${status}`;
+      const statusMessages = {
+        connecting: 'Connecting...',
+        connected: 'Connected',
+        disconnected: 'Disconnected'
+      };
+      statusText.textContent = statusMessages[status];
+    }
+
+    function addMessage(text, type) {
+      const div = document.createElement('div');
+      div.className = `message ${type}`;
+      const prefix = type === 'sent' ? '>' : '<';
+      const truncated = text.length > 60 ? text.substring(0, 60) + '...' : text;
+      div.textContent = `${prefix} ${truncated}`;
+      messagesContainer.appendChild(div);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      // Keep only last 10 messages
+      const messages = messagesContainer.querySelectorAll('.message');
+      if (messages.length > 10) {
+        messages[0].remove();
+      }
+    }
+
+    function sendToServer(type, data) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        const message = JSON.stringify({ type, data });
+        ws.send(message);
+        addMessage(type, 'sent');
+      }
+    }
+
+    function updatePreview(html, css) {
+      previewContainer.classList.remove('empty');
+      previewContainer.innerHTML = '';
+
+      const iframe = document.createElement('iframe');
+      iframe.id = 'previewFrame';
+      previewContainer.appendChild(iframe);
+
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      const fullHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>${css}</style>
+        </head>
+        <body style="margin:0;padding:0;">
+          ${html}
+        </body>
+        </html>
+      `;
+      doc.open();
+      doc.write(fullHtml);
+      doc.close();
+
+      // Resize iframe to fit content
+      setTimeout(() => {
+        const container = doc.querySelector('.scene-container');
+        if (container) {
+          iframe.style.width = container.offsetWidth + 'px';
+          iframe.style.height = container.offsetHeight + 'px';
+        }
+      }, 100);
+    }
+
+    function updateComponentDisplay(type, data, filename) {
+      const dropZone = componentDropZones[type];
+      const fileLabel = componentFiles[type];
+
+      dropZone.classList.remove('empty');
+      const preview = JSON.stringify(data, null, 2);
+      const truncated = preview.length > 500 ? preview.substring(0, 500) + '\n...' : preview;
+      dropZone.innerHTML = `<div class="component-content">${truncated}</div>`;
+      fileLabel.textContent = filename || 'loaded';
+    }
+
+    function connect() {
+      updateStatus('connecting');
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+
+      ws.onopen = () => {
+        updateStatus('connected');
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          addMessage(msg.type, 'received');
+
+          if (msg.type === 'COMPONENTS_LOADED') {
+            const { data, template, theme } = msg.data;
+            if (data) updateComponentDisplay('data', data, currentScene?.data);
+            if (template) updateComponentDisplay('template', template, currentScene?.template);
+            if (theme) updateComponentDisplay('theme', theme, currentScene?.theme);
+          }
+
+          if (msg.type === 'RENDER_RESULT') {
+            updatePreview(msg.data.html, msg.data.css);
+          }
+
+          if (msg.type === 'ERROR') {
+            console.error('Server error:', msg.message);
+          }
+        } catch (e) {
+          addMessage(event.data, 'received');
+        }
+      };
+
+      ws.onclose = () => {
+        updateStatus('disconnected');
+        setTimeout(connect, 3000);
+      };
+
+      ws.onerror = () => {
+        updateStatus('disconnected');
+      };
+    }
+
+    async function loadSceneFile(file) {
+      try {
+        const text = await file.text();
+        const scene = JSON.parse(text);
+
+        currentScene = scene;
+        sceneName.textContent = scene.name || scene.id || file.name;
+
+        // Show file references
+        if (scene.data) componentFiles.data.textContent = scene.data;
+        if (scene.template) componentFiles.template.textContent = scene.template;
+        if (scene.theme) componentFiles.theme.textContent = scene.theme;
+
+        // Clear component displays
+        Object.values(componentDropZones).forEach(zone => {
+          zone.classList.add('empty');
+          zone.innerHTML = 'Loading...';
+        });
+
+        sendToServer('SCENE_LOADED', { scene, filename: file.name });
+
+      } catch (e) {
+        alert('Invalid scene JSON file: ' + e.message);
+      }
+    }
+
+    async function loadComponentFile(file, type) {
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        updateComponentDisplay(type, data, file.name);
+        sendToServer('COMPONENT_UPDATED', { type, data, filename: file.name });
+
+      } catch (e) {
+        alert(`Invalid ${type} JSON file: ` + e.message);
+      }
+    }
+
+    function setupDropZone(element, onDrop) {
+      element.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        element.classList.add('drag-over');
+      });
+
+      element.addEventListener('dragleave', () => {
+        element.classList.remove('drag-over');
+      });
+
+      element.addEventListener('drop', (e) => {
+        e.preventDefault();
+        element.classList.remove('drag-over');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          onDrop(files[0]);
+        }
+      });
+    }
+
+    setupDropZone(mainDropZone, loadSceneFile);
+
+    Object.entries(componentDropZones).forEach(([type, element]) => {
+      setupDropZone(element, (file) => loadComponentFile(file, type));
+    });
+
+    connect();
+  </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "id": "wedding-invitation",
+  "name": "Wedding Invitation",
+  "data": "wedding-invitation-data.json",
+  "template": "wedding-invitation-template.json",
+  "theme": "wedding-invitation-theme.json"
+}
