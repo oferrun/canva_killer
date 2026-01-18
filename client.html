@@ -22,20 +22,25 @@
 
     /* Left Panel - Controls */
     .left-panel {
-      width: 400px;
-      min-width: 400px;
-      padding: 20px;
+      width: 320px;
+      min-width: 320px;
+      padding: 15px;
       overflow-y: auto;
       border-right: 1px solid #ddd;
       background: #fff;
     }
     h1 {
-      margin: 0 0 20px 0;
-      font-size: 24px;
+      margin: 0 0 15px 0;
+      font-size: 20px;
+    }
+    h2 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #333;
     }
 
-    /* Right Panel - Preview */
-    .right-panel {
+    /* Center Panel - Preview */
+    .center-panel {
       flex: 1;
       padding: 20px;
       overflow: auto;
@@ -64,12 +69,105 @@
       display: block;
     }
 
+    /* Right Panel - Data Items */
+    .right-panel {
+      width: 300px;
+      min-width: 300px;
+      padding: 15px;
+      overflow-y: auto;
+      border-left: 1px solid #ddd;
+      background: #fff;
+    }
+    .right-panel h2 {
+      margin: 0 0 15px 0;
+      font-size: 16px;
+      color: #333;
+    }
+    .right-panel.empty-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 14px;
+    }
+
+    /* Data Item Editor */
+    .data-item {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .data-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .data-item-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: #333;
+    }
+    .data-item-type {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: #e5e5e5;
+      color: #666;
+    }
+    .data-item-type.text { background: #dbeafe; color: #1e40af; }
+    .data-item-type.image { background: #dcfce7; color: #166534; }
+
+    .data-item textarea {
+      width: 100%;
+      min-height: 60px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: inherit;
+      resize: vertical;
+    }
+    .data-item textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+
+    .image-drop-zone {
+      border: 2px dashed #ccc;
+      border-radius: 4px;
+      padding: 15px;
+      text-align: center;
+      background: #fafafa;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .image-drop-zone.drag-over {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+    .image-drop-zone.has-image {
+      padding: 8px;
+      border-style: solid;
+    }
+    .image-drop-zone img {
+      max-width: 100%;
+      max-height: 120px;
+      border-radius: 4px;
+    }
+    .image-drop-zone .placeholder {
+      color: #999;
+      font-size: 12px;
+    }
+
     /* Status */
     .status-container {
       background: #f8f9fa;
       border-radius: 8px;
-      padding: 12px 15px;
-      margin-bottom: 15px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -80,20 +178,20 @@
     }
     .status-indicator {
       display: inline-block;
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      margin-right: 8px;
+      margin-right: 6px;
     }
     .status-indicator.connected { background: #22c55e; }
     .status-indicator.disconnected { background: #ef4444; }
     .status-indicator.connecting { background: #f59e0b; }
     .status-text {
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 500;
     }
     .scene-name {
-      font-size: 12px;
+      font-size: 11px;
       color: #666;
     }
 
@@ -101,10 +199,10 @@
     .drop-zone {
       border: 2px dashed #ccc;
       border-radius: 8px;
-      padding: 25px;
+      padding: 20px;
       text-align: center;
       background: #fafafa;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       transition: all 0.2s;
     }
     .drop-zone.drag-over {
@@ -113,27 +211,27 @@
     }
     .drop-zone h2 {
       margin: 0 0 5px 0;
-      font-size: 16px;
+      font-size: 14px;
       color: #333;
     }
     .drop-zone p {
       margin: 0;
       color: #666;
-      font-size: 13px;
+      font-size: 12px;
     }
 
     /* Component Cards */
     .component-card {
       background: #fafafa;
-      border-radius: 8px;
-      margin-bottom: 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
       overflow: hidden;
       border: 1px solid #eee;
     }
     .component-header {
-      padding: 10px 12px;
+      padding: 8px 10px;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 11px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -142,13 +240,13 @@
     .component-header.template { background: #dcfce7; color: #166534; }
     .component-header.theme { background: #fef3c7; color: #92400e; }
     .component-file {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: normal;
       color: #666;
     }
     .component-drop {
-      padding: 12px;
-      min-height: 60px;
+      padding: 10px;
+      min-height: 50px;
       border: 2px dashed transparent;
       transition: all 0.2s;
     }
@@ -161,15 +259,15 @@
       align-items: center;
       justify-content: center;
       color: #999;
-      font-size: 12px;
+      font-size: 11px;
     }
     .component-content {
       background: #fff;
       border-radius: 4px;
-      padding: 8px;
+      padding: 6px;
       font-family: monospace;
-      font-size: 10px;
-      max-height: 100px;
+      font-size: 9px;
+      max-height: 60px;
       overflow-y: auto;
       white-space: pre-wrap;
       word-break: break-all;
@@ -179,23 +277,23 @@
     /* Messages */
     .messages {
       background: #fafafa;
-      border-radius: 8px;
-      padding: 10px;
-      max-height: 120px;
+      border-radius: 6px;
+      padding: 8px;
+      max-height: 80px;
       overflow-y: auto;
       border: 1px solid #eee;
     }
     .messages h3 {
-      margin: 0 0 8px 0;
-      font-size: 12px;
+      margin: 0 0 6px 0;
+      font-size: 10px;
       color: #666;
     }
     .message {
-      padding: 4px 8px;
-      margin: 3px 0;
+      padding: 3px 6px;
+      margin: 2px 0;
       background: #fff;
       border-radius: 3px;
-      font-size: 10px;
+      font-size: 9px;
       font-family: monospace;
       border: 1px solid #eee;
     }
@@ -214,12 +312,12 @@
           <span id="statusIndicator" class="status-indicator connecting"></span>
           <span id="statusText" class="status-text">Connecting...</span>
         </div>
-        <span id="sceneName" class="scene-name">No scene loaded</span>
+        <span id="sceneName" class="scene-name">No scene</span>
       </div>
 
       <div id="mainDropZone" class="drop-zone">
-        <h2>Drop Scene File Here</h2>
-        <p>Drag and drop a scene JSON file to load it</p>
+        <h2>Drop Scene File</h2>
+        <p>Drag a scene JSON file here</p>
       </div>
 
       <div class="component-card">
@@ -228,7 +326,7 @@
           <span id="dataFile" class="component-file">-</span>
         </div>
         <div id="dataDropZone" class="component-drop empty" data-type="data">
-          Drop data JSON here
+          Drop data JSON
         </div>
       </div>
 
@@ -238,7 +336,7 @@
           <span id="templateFile" class="component-file">-</span>
         </div>
         <div id="templateDropZone" class="component-drop empty" data-type="template">
-          Drop template JSON here
+          Drop template JSON
         </div>
       </div>
 
@@ -248,7 +346,7 @@
           <span id="themeFile" class="component-file">-</span>
         </div>
         <div id="themeDropZone" class="component-drop empty" data-type="theme">
-          Drop theme JSON here
+          Drop theme JSON
         </div>
       </div>
 
@@ -257,10 +355,18 @@
       </div>
     </div>
 
-    <!-- Right Panel: Preview -->
-    <div class="right-panel">
+    <!-- Center Panel: Preview -->
+    <div class="center-panel">
       <div id="previewContainer" class="preview-container empty">
         Drop a scene file to preview
+      </div>
+    </div>
+
+    <!-- Right Panel: Data Items -->
+    <div class="right-panel" id="dataItemsPanel">
+      <h2>Data Items</h2>
+      <div id="dataItemsList" class="empty-state">
+        Load a scene to edit data items
       </div>
     </div>
   </div>
@@ -272,6 +378,7 @@
     const messagesContainer = document.getElementById('messages');
     const mainDropZone = document.getElementById('mainDropZone');
     const previewContainer = document.getElementById('previewContainer');
+    const dataItemsList = document.getElementById('dataItemsList');
 
     const componentDropZones = {
       data: document.getElementById('dataDropZone'),
@@ -287,6 +394,7 @@
 
     let ws = null;
     let currentScene = null;
+    let currentData = null;
 
     function updateStatus(status) {
       statusIndicator.className = `status-indicator ${status}`;
@@ -302,14 +410,13 @@
       const div = document.createElement('div');
       div.className = `message ${type}`;
       const prefix = type === 'sent' ? '>' : '<';
-      const truncated = text.length > 60 ? text.substring(0, 60) + '...' : text;
+      const truncated = text.length > 40 ? text.substring(0, 40) + '...' : text;
       div.textContent = `${prefix} ${truncated}`;
       messagesContainer.appendChild(div);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-      // Keep only last 10 messages
       const messages = messagesContainer.querySelectorAll('.message');
-      if (messages.length > 10) {
+      if (messages.length > 8) {
         messages[0].remove();
       }
     }
@@ -346,7 +453,6 @@
       doc.write(fullHtml);
       doc.close();
 
-      // Resize iframe to fit content
       setTimeout(() => {
         const container = doc.querySelector('.scene-container');
         if (container) {
@@ -362,9 +468,126 @@
 
       dropZone.classList.remove('empty');
       const preview = JSON.stringify(data, null, 2);
-      const truncated = preview.length > 500 ? preview.substring(0, 500) + '\n...' : preview;
+      const truncated = preview.length > 300 ? preview.substring(0, 300) + '\n...' : preview;
       dropZone.innerHTML = `<div class="component-content">${truncated}</div>`;
       fileLabel.textContent = filename || 'loaded';
+    }
+
+    function renderDataItemsEditor(data) {
+      currentData = data;
+
+      if (!data || !data.data_items || data.data_items.length === 0) {
+        dataItemsList.innerHTML = '<div class="empty-state">No data items</div>';
+        return;
+      }
+
+      dataItemsList.innerHTML = '';
+      dataItemsList.classList.remove('empty-state');
+
+      data.data_items.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'data-item';
+        itemDiv.dataset.index = index;
+        itemDiv.dataset.id = item.id;
+
+        const header = document.createElement('div');
+        header.className = 'data-item-header';
+        header.innerHTML = `
+          <span class="data-item-name">${item.display_name}</span>
+          <span class="data-item-type ${item.type}">${item.type}</span>
+        `;
+        itemDiv.appendChild(header);
+
+        if (item.type === 'text') {
+          const textarea = document.createElement('textarea');
+          textarea.value = item.content || '';
+          textarea.placeholder = 'Enter text...';
+          textarea.addEventListener('input', (e) => {
+            updateDataItem(item.id, 'content', e.target.value);
+          });
+          itemDiv.appendChild(textarea);
+        } else if (item.type === 'image') {
+          const dropZone = document.createElement('div');
+          dropZone.className = 'image-drop-zone' + (item.image_url ? ' has-image' : '');
+
+          if (item.image_url) {
+            dropZone.innerHTML = `<img src="${item.image_url}" alt="${item.display_name}" />`;
+          } else {
+            dropZone.innerHTML = '<div class="placeholder">Drop image here</div>';
+          }
+
+          setupImageDropZone(dropZone, item.id);
+          itemDiv.appendChild(dropZone);
+        }
+
+        dataItemsList.appendChild(itemDiv);
+      });
+    }
+
+    function setupImageDropZone(element, itemId) {
+      element.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        element.classList.add('drag-over');
+      });
+
+      element.addEventListener('dragleave', () => {
+        element.classList.remove('drag-over');
+      });
+
+      element.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        element.classList.remove('drag-over');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+          const file = files[0];
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const dataUrl = event.target.result;
+            element.classList.add('has-image');
+            element.innerHTML = `<img src="${dataUrl}" alt="Uploaded image" />`;
+            updateDataItem(itemId, 'image_url', dataUrl);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Also allow clicking to upload
+      element.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              const dataUrl = event.target.result;
+              element.classList.add('has-image');
+              element.innerHTML = `<img src="${dataUrl}" alt="Uploaded image" />`;
+              updateDataItem(itemId, 'image_url', dataUrl);
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+        input.click();
+      });
+    }
+
+    function updateDataItem(itemId, field, value) {
+      if (!currentData || !currentData.data_items) return;
+
+      const item = currentData.data_items.find(i => i.id === itemId);
+      if (item) {
+        item[field] = value;
+
+        // Send updated data to server
+        sendToServer('COMPONENT_UPDATED', {
+          type: 'data',
+          data: currentData,
+          filename: 'edited'
+        });
+      }
     }
 
     function connect() {
@@ -383,7 +606,10 @@
 
           if (msg.type === 'COMPONENTS_LOADED') {
             const { data, template, theme } = msg.data;
-            if (data) updateComponentDisplay('data', data, currentScene?.data);
+            if (data) {
+              updateComponentDisplay('data', data, currentScene?.data);
+              renderDataItemsEditor(data);
+            }
             if (template) updateComponentDisplay('template', template, currentScene?.template);
             if (theme) updateComponentDisplay('theme', theme, currentScene?.theme);
           }
@@ -418,16 +644,16 @@
         currentScene = scene;
         sceneName.textContent = scene.name || scene.id || file.name;
 
-        // Show file references
         if (scene.data) componentFiles.data.textContent = scene.data;
         if (scene.template) componentFiles.template.textContent = scene.template;
         if (scene.theme) componentFiles.theme.textContent = scene.theme;
 
-        // Clear component displays
         Object.values(componentDropZones).forEach(zone => {
           zone.classList.add('empty');
           zone.innerHTML = 'Loading...';
         });
+
+        dataItemsList.innerHTML = 'Loading...';
 
         sendToServer('SCENE_LOADED', { scene, filename: file.name });
 
@@ -442,6 +668,11 @@
         const data = JSON.parse(text);
 
         updateComponentDisplay(type, data, file.name);
+
+        if (type === 'data') {
+          renderDataItemsEditor(data);
+        }
+
         sendToServer('COMPONENT_UPDATED', { type, data, filename: file.name });
 
       } catch (e) {
