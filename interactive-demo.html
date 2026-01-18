@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Scene Editor</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background: #1e1e1e;
+      color: #fff;
+    }
+
+    .editor-panel {
+      width: 400px;
+      background: #252526;
+      border-right: 1px solid #3e3e42;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .editor-header {
+      padding: 20px;
+      background: #2d2d30;
+      border-bottom: 1px solid #3e3e42;
+    }
+
+    .editor-header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .theme-selector {
+      margin-top: 12px;
+    }
+
+    .theme-selector label {
+      display: block;
+      font-size: 12px;
+      color: #ccc;
+      margin-bottom: 6px;
+    }
+
+    .theme-selector select {
+      width: 100%;
+      padding: 8px;
+      background: #3c3c3c;
+      border: 1px solid #555;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .editor-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .data-item {
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #2d2d30;
+      border-radius: 6px;
+      border: 1px solid #3e3e42;
+    }
+
+    .data-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .data-item-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .data-item-type {
+      font-size: 11px;
+      padding: 3px 8px;
+      background: #0e639c;
+      border-radius: 3px;
+      color: #fff;
+    }
+
+    .data-item label {
+      display: block;
+      font-size: 12px;
+      color: #ccc;
+      margin-bottom: 6px;
+    }
+
+    .data-item input,
+    .data-item textarea {
+      width: 100%;
+      padding: 8px 10px;
+      background: #3c3c3c;
+      border: 1px solid #555;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .data-item input:focus,
+    .data-item textarea:focus {
+      outline: none;
+      border-color: #0e639c;
+    }
+
+    .data-item textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .preview-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .preview-header {
+      padding: 20px;
+      background: #2d2d30;
+      border-bottom: 1px solid #3e3e42;
+    }
+
+    .preview-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .preview-content {
+      flex: 1;
+      overflow: auto;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    #preview-container {
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .editor-content::-webkit-scrollbar,
+    .preview-content::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .editor-content::-webkit-scrollbar-track,
+    .preview-content::-webkit-scrollbar-track {
+      background: #1e1e1e;
+    }
+
+    .editor-content::-webkit-scrollbar-thumb,
+    .preview-content::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 5px;
+    }
+
+    .editor-content::-webkit-scrollbar-thumb:hover,
+    .preview-content::-webkit-scrollbar-thumb:hover {
+      background: #777;
+    }
+
+    .update-info {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="editor-panel">
+    <div class="editor-header">
+      <h1>Scene Data Editor</h1>
+      <p style="font-size: 12px; color: #888; margin-top: 4px;">Edit values to see live updates</p>
+
+      <div class="theme-selector">
+        <label for="theme-select">Theme:</label>
+        <select id="theme-select">
+          <option value="elegant">Elegant Wedding Theme</option>
+          <option value="modern">Modern Bold Wedding Theme</option>
+        </select>
+      </div>
+    </div>
+    <div class="editor-content" id="editor-content">
+      <!-- Data items will be inserted here -->
+    </div>
+  </div>
+
+  <div class="preview-panel">
+    <div class="preview-header">
+      <h2>Live Preview</h2>
+    </div>
+    <div class="preview-content">
+      <div id="preview-container"></div>
+    </div>
+  </div>
+
+  <script>
+    // Embedded scene data
+    const sceneData = {
+  "scene_id": "wedding_invitation_001",
+  "data_items": [
+    {
+      "id": "couple_names",
+      "type": "text",
+      "display_name": "Couple Names",
+      "content": "Sarah & Michael"
+    },
+    {
+      "id": "invitation_header",
+      "type": "text",
+      "display_name": "Invitation Header",
+      "content": "Together with their families"
+    },
+    {
+      "id": "invitation_text",
+      "type": "text",
+      "display_name": "Invitation Text",
+      "content": "request the honor of your presence at their wedding"
+    },
+    {
+      "id": "wedding_date",
+      "type": "text",
+      "display_name": "Wedding Date",
+      "content": "Saturday, June 15th, 2026"
+    },
+    {
+      "id": "wedding_time",
+      "type": "text",
+      "display_name": "Wedding Time",
+      "content": "4:00 in the afternoon"
+    },
+    {
+      "id": "venue_name",
+      "type": "text",
+      "display_name": "Venue Name",
+      "content": "The Garden Estate"
+    },
+    {
+      "id": "venue_address",
+      "type": "text",
+      "display_name": "Venue Address",
+      "content": "123 Rose Garden Lane, Bloomfield"
+    },
+    {
+      "id": "rsvp_text",
+      "type": "text",
+      "display_name": "RSVP Text",
+      "content": "Please reply by May 1st, 2026"
+    },
+    {
+      "id": "decorative_image",
+      "type": "image",
+      "display_name": "Decorative Floral Image",
+      "image_url": "https://example.com/floral-decoration.png"
+    }
+  ]
+};
+    const sceneTemplate = {
+  "template_id": "wedding_invitation_template_001",
+  "template_name": "Classic Wedding Invitation",
+  "canvas": {
+    "width": 800,
+    "height": 1200
+  },
+  "elements": [
+    {
+      "element_id": "background",
+      "element_type": "shape",
+      "shape_type": "rectangle",
+      "style": {
+        "width": "100%",
+        "height": "100%",
+        "fill": "background_primary",
+        "border": "none"
+      }
+    },
+    {
+      "element_id": "top_border",
+      "element_type": "shape",
+      "shape_type": "rectangle",
+      "style": {
+        "width": "90%",
+        "height": "2px",
+        "margin_top": "80px",
+        "margin_left": "5%",
+        "fill": "accent_gold",
+        "border": "none"
+      }
+    },
+    {
+      "element_id": "decorative_top",
+      "element_type": "data_item",
+      "data_item_id": "decorative_image",
+      "style": {
+        "width": "200px",
+        "height": "150px",
+        "margin_top": "100px",
+        "margin_left": "auto",
+        "margin_right": "auto",
+        "display": "block"
+      }
+    },
+    {
+      "element_id": "header_text",
+      "element_type": "data_item",
+      "data_item_id": "invitation_header",
+      "style": {
+        "font": "serif_secondary",
+        "font_size": "18px",
+        "text_align": "center",
+        "color": "text_secondary",
+        "margin_top": "40px",
+        "letter_spacing": "2px",
+        "text_transform": "uppercase"
+      }
+    },
+    {
+      "element_id": "couple_names_display",
+      "element_type": "data_item",
+      "data_item_id": "couple_names",
+      "style": {
+        "font": "script_primary",
+        "font_size": "64px",
+        "text_align": "center",
+        "color": "text_primary",
+        "margin_top": "30px",
+        "line_height": "1.2"
+      }
+    },
+    {
+      "element_id": "invitation_message",
+      "element_type": "data_item",
+      "data_item_id": "invitation_text",
+      "style": {
+        "font": "serif_secondary",
+        "font_size": "20px",
+        "text_align": "center",
+        "color": "text_secondary",
+        "margin_top": "25px",
+        "letter_spacing": "1px"
+      }
+    },
+    {
+      "element_id": "divider",
+      "element_type": "shape",
+      "shape_type": "circle",
+      "style": {
+        "width": "8px",
+        "height": "8px",
+        "margin_top": "40px",
+        "margin_left": "auto",
+        "margin_right": "auto",
+        "fill": "accent_gold",
+        "border": "none"
+      }
+    },
+    {
+      "element_id": "date_display",
+      "element_type": "data_item",
+      "data_item_id": "wedding_date",
+      "style": {
+        "font": "serif_primary",
+        "font_size": "28px",
+        "text_align": "center",
+        "color": "text_primary",
+        "margin_top": "40px",
+        "font_weight": "600"
+      }
+    },
+    {
+      "element_id": "time_display",
+      "element_type": "data_item",
+      "data_item_id": "wedding_time",
+      "style": {
+        "font": "serif_secondary",
+        "font_size": "20px",
+        "text_align": "center",
+        "color": "text_secondary",
+        "margin_top": "15px"
+      }
+    },
+    {
+      "element_id": "venue_container",
+      "element_type": "container",
+      "style": {
+        "margin_top": "50px",
+        "padding": "30px"
+      },
+      "children": [
+        {
+          "element_id": "venue_name_display",
+          "element_type": "data_item",
+          "data_item_id": "venue_name",
+          "style": {
+            "font": "serif_primary",
+            "font_size": "24px",
+            "text_align": "center",
+            "color": "text_primary",
+            "font_weight": "600"
+          }
+        },
+        {
+          "element_id": "venue_address_display",
+          "element_type": "data_item",
+          "data_item_id": "venue_address",
+          "style": {
+            "font": "serif_secondary",
+            "font_size": "18px",
+            "text_align": "center",
+            "color": "text_secondary",
+            "margin_top": "10px"
+          }
+        }
+      ]
+    },
+    {
+      "element_id": "bottom_border",
+      "element_type": "shape",
+      "shape_type": "rectangle",
+      "style": {
+        "width": "90%",
+        "height": "2px",
+        "margin_top": "60px",
+        "margin_left": "5%",
+        "fill": "accent_gold",
+        "border": "none"
+      }
+    },
+    {
+      "element_id": "rsvp_display",
+      "element_type": "data_item",
+      "data_item_id": "rsvp_text",
+      "style": {
+        "font": "serif_secondary",
+        "font_size": "16px",
+        "text_align": "center",
+        "color": "text_tertiary",
+        "margin_top": "40px",
+        "font_style": "italic"
+      }
+    }
+  ]
+};
+    const themes = {
+      elegant: {
+  "theme_id": "elegant_wedding_theme_001",
+  "theme_name": "Elegant Wedding Theme",
+  "color_palette": [
+    {
+      "id": "background_primary",
+      "name": "Cream White",
+      "r": 252,
+      "g": 248,
+      "b": 243,
+      "a": 1
+    },
+    {
+      "id": "text_primary",
+      "name": "Charcoal",
+      "r": 45,
+      "g": 45,
+      "b": 45,
+      "a": 1
+    },
+    {
+      "id": "text_secondary",
+      "name": "Warm Gray",
+      "r": 102,
+      "g": 102,
+      "b": 102,
+      "a": 1
+    },
+    {
+      "id": "text_tertiary",
+      "name": "Light Gray",
+      "r": 140,
+      "g": 140,
+      "b": 140,
+      "a": 1
+    },
+    {
+      "id": "accent_gold",
+      "name": "Rose Gold",
+      "r": 183,
+      "g": 110,
+      "b": 121,
+      "a": 1
+    },
+    {
+      "id": "accent_light",
+      "name": "Blush Pink",
+      "r": 245,
+      "g": 222,
+      "b": 224,
+      "a": 1
+    },
+    {
+      "id": "accent_dark",
+      "name": "Deep Rose",
+      "r": 142,
+      "g": 78,
+      "b": 93,
+      "a": 1
+    },
+    {
+      "id": "border_color",
+      "name": "Soft Beige",
+      "r": 220,
+      "g": 210,
+      "b": 200,
+      "a": 1
+    }
+  ],
+  "font_palette": [
+    {
+      "font_id": "script_primary",
+      "font_name": "Great Vibes",
+      "font_url": "https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
+    },
+    {
+      "font_id": "serif_primary",
+      "font_name": "Playfair Display",
+      "font_url": "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap"
+    },
+    {
+      "font_id": "serif_secondary",
+      "font_name": "Cormorant Garamond",
+      "font_url": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap"
+    },
+    {
+      "font_id": "sans_primary",
+      "font_name": "Montserrat",
+      "font_url": "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap"
+    }
+  ]
+},
+      modern: {
+  "theme_id": "modern_wedding_theme_001",
+  "theme_name": "Modern Bold Wedding Theme",
+  "color_palette": [
+    {
+      "id": "background_primary",
+      "name": "Deep Navy",
+      "r": 26,
+      "g": 35,
+      "b": 53,
+      "a": 1
+    },
+    {
+      "id": "text_primary",
+      "name": "Pure White",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 1
+    },
+    {
+      "id": "text_secondary",
+      "name": "Soft Silver",
+      "r": 200,
+      "g": 205,
+      "b": 210,
+      "a": 1
+    },
+    {
+      "id": "text_tertiary",
+      "name": "Muted Blue",
+      "r": 150,
+      "g": 165,
+      "b": 180,
+      "a": 1
+    },
+    {
+      "id": "accent_gold",
+      "name": "Electric Coral",
+      "r": 255,
+      "g": 111,
+      "b": 97,
+      "a": 1
+    },
+    {
+      "id": "accent_light",
+      "name": "Soft Peach",
+      "r": 255,
+      "g": 193,
+      "b": 180,
+      "a": 1
+    },
+    {
+      "id": "accent_dark",
+      "name": "Deep Coral",
+      "r": 220,
+      "g": 70,
+      "b": 60,
+      "a": 1
+    },
+    {
+      "id": "border_color",
+      "name": "Steel Blue",
+      "r": 70,
+      "g": 85,
+      "b": 105,
+      "a": 1
+    }
+  ],
+  "font_palette": [
+    {
+      "font_id": "script_primary",
+      "font_name": "Allura",
+      "font_url": "https://fonts.googleapis.com/css2?family=Allura&display=swap"
+    },
+    {
+      "font_id": "serif_primary",
+      "font_name": "Abril Fatface",
+      "font_url": "https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap"
+    },
+    {
+      "font_id": "serif_secondary",
+      "font_name": "Lora",
+      "font_url": "https://fonts.googleapis.com/css2?family=Lora:wght@400;600&display=swap"
+    },
+    {
+      "font_id": "sans_primary",
+      "font_name": "Raleway",
+      "font_url": "https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&display=swap"
+    }
+  ]
+}
+    };
+
+    let currentTheme = 'elegant';
+
+    // Inline renderer (browser-compatible version)
+    
+    function renderScene(scene) {
+      const { data, template, theme } = scene;
+
+      const dataItemMap = new Map();
+      data.data_items.forEach(item => dataItemMap.set(item.id, item));
+
+      const colorMap = new Map();
+      theme.color_palette.forEach(color => colorMap.set(color.id, color));
+
+      const fontMap = new Map();
+      theme.font_palette.forEach(font => fontMap.set(font.font_id, font));
+
+      const css = generateCSS(theme, template, fontMap, colorMap);
+      const html = generateHTML(template, dataItemMap, scene);
+
+      return { html, css };
+    }
+
+    function generateCSS(theme, template, fontMap, colorMap) {
+      let css = '';
+
+      const fontImports = theme.font_palette.map(font =>
+        `@import url('${font.font_url}');`
+      ).join('\n');
+
+      css += fontImports + '\n\n';
+
+      css += `.scene-container {
+  width: ${template.canvas.width}px;
+  height: ${template.canvas.height}px;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}\n\n`;
+
+      css += `.scene-container * {
+  box-sizing: border-box;
+}\n\n`;
+
+      template.elements.forEach(element => {
+        css += generateElementCSS(element, fontMap, colorMap);
+      });
+
+      return css;
+    }
+
+    function generateElementCSS(element, fontMap, colorMap, prefix = '') {
+      let css = '';
+      const className = prefix ? `${prefix}-${element.element_id}` : element.element_id;
+
+      if (element.style) {
+        const styles = convertStyleToCSS(element.style, fontMap, colorMap);
+        if (styles) {
+          css += `.${className} {\n${styles}}\n\n`;
+        }
+      }
+
+      if (element.children) {
+        element.children.forEach(child => {
+          css += generateElementCSS(child, fontMap, colorMap, className);
+        });
+      }
+
+      return css;
+    }
+
+    function convertStyleToCSS(style, fontMap, colorMap, isBackgroundElement = false) {
+      let css = '';
+
+      const isFullSize = style.width === '100%' && style.height === '100%';
+
+      if (isFullSize) {
+        // This is a background element - position it absolutely
+        css += '  position: absolute;\n';
+        css += '  top: 0;\n';
+        css += '  left: 0;\n';
+        css += '  z-index: 0;\n';
+      } else {
+        // All other elements should stack above the background
+        css += '  position: relative;\n';
+        css += '  z-index: 1;\n';
+      }
+
+      for (const [key, value] of Object.entries(style)) {
+        if (value === undefined) continue;
+
+        let cssProperty = key.replace(/_/g, '-');
+        let cssValue = value;
+
+        if (key === 'font' && fontMap.has(value)) {
+          const font = fontMap.get(value);
+          css += `  font-family: '${font.font_name}', serif;\n`;
+          continue;
+        }
+
+        if (key === 'fill') {
+          cssProperty = 'background-color';
+        }
+
+        if ((key === 'color' || key === 'fill' || key === 'background_color' || key === 'border_color') && colorMap.has(value)) {
+          const color = colorMap.get(value);
+          cssValue = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+        }
+
+        css += `  ${cssProperty}: ${cssValue};\n`;
+      }
+
+      return css;
+    }
+
+    function generateHTML(template, dataItemMap, scene) {
+      let html = '<div class="scene-container">\n';
+
+      template.elements.forEach(element => {
+        html += generateElementHTML(element, dataItemMap, scene, 1);
+      });
+
+      html += '</div>';
+      return html;
+    }
+
+    function generateElementHTML(element, dataItemMap, scene, indentLevel, parentPrefix = '') {
+      const indent = '  '.repeat(indentLevel);
+      const className = parentPrefix ? `${parentPrefix}-${element.element_id}` : element.element_id;
+      let html = '';
+
+      switch (element.element_type) {
+        case 'data_item':
+          html += generateDataItemHTML(element, dataItemMap, className, indent);
+          break;
+        case 'shape':
+          html += `${indent}<div class="${className}"></div>\n`;
+          break;
+        case 'container':
+          html += generateContainerHTML(element, dataItemMap, scene, className, indent, indentLevel);
+          break;
+        case 'image':
+          html += `${indent}<img class="${className}" src="${element.image_url || ''}" alt="" />\n`;
+          break;
+        case 'svg':
+          html += `${indent}<div class="${className}">${element.svg_content || ''}</div>\n`;
+          break;
+      }
+
+      return html;
+    }
+
+    function generateDataItemHTML(element, dataItemMap, className, indent) {
+      if (!element.data_item_id) return '';
+
+      const dataItem = dataItemMap.get(element.data_item_id);
+      if (!dataItem) return '';
+
+      if (dataItem.type === 'text') {
+        return `${indent}<div class="${className}">${dataItem.content || ''}</div>\n`;
+      } else if (dataItem.type === 'image') {
+        return `${indent}<img class="${className}" src="${dataItem.image_url || ''}" alt="${dataItem.display_name}" />\n`;
+      }
+
+      return '';
+    }
+
+    function generateContainerHTML(element, dataItemMap, scene, className, indent, indentLevel) {
+      let html = `${indent}<div class="${className}">\n`;
+
+      if (element.children) {
+        element.children.forEach(child => {
+          html += generateElementHTML(child, dataItemMap, scene, indentLevel + 1, className);
+        });
+      }
+
+      html += `${indent}</div>\n`;
+      return html;
+    }
+  
+
+    // Initialize editor
+    function initializeEditor() {
+      const editorContent = document.getElementById('editor-content');
+      editorContent.innerHTML = '';
+
+      sceneData.data_items.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'data-item';
+
+        const isText = item.type === 'text';
+        const inputType = isText ? 'textarea' : 'input';
+        const valueKey = isText ? 'content' : 'image_url';
+        const label = isText ? 'Content' : 'Image URL';
+
+        itemDiv.innerHTML = `
+          <div class="data-item-header">
+            <span class="data-item-title">${item.display_name}</span>
+            <span class="data-item-type">${item.type}</span>
+          </div>
+          <label for="item-${item.id}">${label}:</label>
+          <${inputType}
+            id="item-${item.id}"
+            data-item-id="${item.id}"
+            data-index="${index}"
+          >${item[valueKey] || ''}</${inputType}>
+          <div class="update-info">Updates automatically on change</div>
+        `;
+
+        editorContent.appendChild(itemDiv);
+
+        // Add event listener
+        const input = itemDiv.querySelector(`#item-${item.id}`);
+        input.addEventListener('input', handleDataChange);
+      });
+    }
+
+    // Handle data changes
+    function handleDataChange(event) {
+      const index = parseInt(event.target.dataset.index);
+      const item = sceneData.data_items[index];
+      const valueKey = item.type === 'text' ? 'content' : 'image_url';
+
+      item[valueKey] = event.target.value;
+
+      // Re-render
+      renderPreview();
+    }
+
+    // Handle theme change
+    document.getElementById('theme-select').addEventListener('change', (event) => {
+      currentTheme = event.target.value;
+      renderPreview();
+    });
+
+    // Render preview
+    function renderPreview() {
+      console.log('Rendering with theme:', currentTheme);
+
+      const scene = {
+        data: sceneData,
+        template: sceneTemplate,
+        theme: themes[currentTheme]
+      };
+
+      console.log('Theme colors:', scene.theme.color_palette.map(c => c.name));
+
+      const result = renderScene(scene);
+
+      console.log('Generated CSS length:', result.css.length);
+      console.log('Generated HTML length:', result.html.length);
+
+      const previewContainer = document.getElementById('preview-container');
+      previewContainer.innerHTML = result.html;
+
+      // Inject CSS
+      let styleTag = document.getElementById('scene-styles');
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'scene-styles';
+        document.head.appendChild(styleTag);
+      }
+      styleTag.textContent = result.css;
+
+      console.log('Preview rendered successfully');
+    }
+
+    // Initialize
+    console.log('Initializing interactive demo...');
+    initializeEditor();
+    renderPreview();
+  </script>
+</body>
+</html>

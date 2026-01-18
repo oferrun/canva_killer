@@ -1,0 +1,179 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/scene-template.schema.json",
+  "title": "Scene Template",
+  "description": "Schema for scene template defining layout and style hierarchy",
+  "type": "object",
+  "required": ["template_id", "template_name", "canvas", "elements"],
+  "properties": {
+    "template_id": {
+      "type": "string",
+      "description": "Unique identifier for the template"
+    },
+    "template_name": {
+      "type": "string",
+      "description": "Human-readable name for the template"
+    },
+    "canvas": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Canvas width in pixels"
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Canvas height in pixels"
+        }
+      }
+    },
+    "elements": {
+      "type": "array",
+      "description": "Array of element definitions",
+      "items": {
+        "$ref": "#/definitions/element"
+      }
+    }
+  },
+  "definitions": {
+    "element": {
+      "type": "object",
+      "required": ["element_id", "element_type"],
+      "properties": {
+        "element_id": {
+          "type": "string",
+          "description": "Unique identifier for the element"
+        },
+        "element_type": {
+          "type": "string",
+          "enum": ["data_item", "shape", "svg", "container", "image"],
+          "description": "Type of element"
+        },
+        "data_item_id": {
+          "type": "string",
+          "description": "Reference to data item ID (for element_type='data_item')"
+        },
+        "shape_type": {
+          "type": "string",
+          "enum": ["rectangle", "circle"],
+          "description": "Shape type (for element_type='shape')"
+        },
+        "svg_content": {
+          "type": "string",
+          "description": "Inline SVG content (for element_type='svg')"
+        },
+        "image_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Image URL (for element_type='image')"
+        },
+        "style": {
+          "$ref": "#/definitions/elementStyle"
+        },
+        "children": {
+          "type": "array",
+          "description": "Child elements (for element_type='container')",
+          "items": {
+            "$ref": "#/definitions/element"
+          }
+        }
+      }
+    },
+    "elementStyle": {
+      "type": "object",
+      "description": "CSS-like styling properties for elements",
+      "properties": {
+        "width": {
+          "type": "string",
+          "description": "Width (e.g., '100%', '200px')"
+        },
+        "height": {
+          "type": "string",
+          "description": "Height (e.g., '100%', '200px')"
+        },
+        "margin_top": {
+          "type": "string",
+          "description": "Top margin"
+        },
+        "margin_bottom": {
+          "type": "string",
+          "description": "Bottom margin"
+        },
+        "margin_left": {
+          "type": "string",
+          "description": "Left margin"
+        },
+        "margin_right": {
+          "type": "string",
+          "description": "Right margin"
+        },
+        "padding": {
+          "type": "string",
+          "description": "Padding"
+        },
+        "display": {
+          "type": "string",
+          "description": "CSS display property"
+        },
+        "font": {
+          "type": "string",
+          "description": "Font ID reference from theme"
+        },
+        "font_size": {
+          "type": "string",
+          "description": "Font size (e.g., '16px', '1.2em')"
+        },
+        "font_weight": {
+          "type": "string",
+          "description": "Font weight (e.g., '400', '600', 'bold')"
+        },
+        "font_style": {
+          "type": "string",
+          "description": "Font style (e.g., 'normal', 'italic')"
+        },
+        "text_align": {
+          "type": "string",
+          "enum": ["left", "center", "right", "justify"],
+          "description": "Text alignment"
+        },
+        "line_height": {
+          "type": "string",
+          "description": "Line height"
+        },
+        "letter_spacing": {
+          "type": "string",
+          "description": "Letter spacing"
+        },
+        "text_transform": {
+          "type": "string",
+          "enum": ["none", "uppercase", "lowercase", "capitalize"],
+          "description": "Text transformation"
+        },
+        "color": {
+          "type": "string",
+          "description": "Text color ID reference from theme"
+        },
+        "fill": {
+          "type": "string",
+          "description": "Fill color ID reference from theme (for shapes)"
+        },
+        "background_color": {
+          "type": "string",
+          "description": "Background color ID reference from theme"
+        },
+        "border": {
+          "type": "string",
+          "description": "Border definition"
+        },
+        "border_color": {
+          "type": "string",
+          "description": "Border color ID reference from theme"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

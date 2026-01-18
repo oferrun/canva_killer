@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/scene-data.schema.json",
+  "title": "Scene Data",
+  "description": "Schema for scene data containing content items to be displayed",
+  "type": "object",
+  "required": ["scene_id", "data_items"],
+  "properties": {
+    "scene_id": {
+      "type": "string",
+      "description": "Unique identifier for the scene"
+    },
+    "data_items": {
+      "type": "array",
+      "description": "Array of data items to be rendered",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "display_name"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the data item"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["text", "image"],
+            "description": "Type of data item"
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Human-readable name for the data item"
+          },
+          "content": {
+            "type": "string",
+            "description": "Text content (required for type='text')"
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Image URL (required for type='image')"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "type": { "const": "text" } }
+            },
+            "then": {
+              "required": ["content"]
+            }
+          },
+          {
+            "if": {
+              "properties": { "type": { "const": "image" } }
+            },
+            "then": {
+              "required": ["image_url"]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
