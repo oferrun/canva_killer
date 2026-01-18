@@ -115,15 +115,17 @@ function convertStyleToCSS(
 
   // Check if this is a full-size background element (100% width and height)
   const isFullSize = style.width === '100%' && style.height === '100%';
+  // Check if position is explicitly set
+  const hasExplicitPosition = style.position !== undefined;
 
-  if (isFullSize) {
+  if (isFullSize && !hasExplicitPosition) {
     // This is a background element - position it absolutely behind everything
     css += `  position: absolute;\n`;
     css += `  top: 0;\n`;
     css += `  left: 0;\n`;
     css += `  z-index: 0;\n`;
-  } else {
-    // All other elements should stack above the background
+  } else if (!hasExplicitPosition) {
+    // All other elements without explicit position should stack above the background
     css += `  position: relative;\n`;
     css += `  z-index: 1;\n`;
   }

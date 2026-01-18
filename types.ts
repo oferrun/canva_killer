@@ -46,6 +46,14 @@ export interface ElementStyle {
   padding?: string;
   display?: string;
 
+  // Positioning
+  position?: string;
+  top?: string;
+  left?: string;
+  right?: string;
+  bottom?: string;
+  z_index?: string;
+
   // Text
   font?: string;  // References font_id from theme
   font_size?: string;
@@ -62,6 +70,9 @@ export interface ElementStyle {
   background_color?: string;  // References color id from theme
   border?: string;
   border_color?: string;  // References color id from theme
+
+  // Image
+  object_fit?: string;  // cover, contain, fill, none, scale-down
 }
 
 export type ElementType = 'data_item' | 'shape' | 'svg' | 'container' | 'image';

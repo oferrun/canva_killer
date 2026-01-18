@@ -1,5 +1,7 @@
 import { renderScene } from "./renderer";
-import type { Scene, SceneData, Template, Theme } from "./types";
+import { convertSvgToScene } from "./svg-converter";
+import { createEmptyScene, addDataItemToScene, saveSceneToFile } from "./ckengine";
+import type { Scene, SceneData, Template, Theme, DataItem } from "./types";
 
 // Store component data per WebSocket connection
 const clientScenes = new Map<unknown, {
@@ -34,7 +36,7 @@ function tryRenderScene(ws: unknown): { html: string; css: string } | null {
 
 const server = Bun.serve({
   port: 3000,
-  fetch(req, server) {
+  async fetch(req, server) {
     const url = new URL(req.url);
 
     if (url.pathname === "/ws") {
@@ -48,6 +50,26 @@ const server = Bun.serve({
     if (url.pathname === "/" || url.pathname === "/index.html") {
       return new Response(Bun.file("client.html"), {
         headers: { "Content-Type": "text/html" },
+      });
+    }
+
+    // Serve static files (images, etc.)
+    const filePath = url.pathname.slice(1); // Remove leading slash
+    const file = Bun.file(filePath);
+    if (await file.exists()) {
+      const ext = filePath.split('.').pop()?.toLowerCase();
+      const contentTypes: Record<string, string> = {
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'svg': 'image/svg+xml',
+        'webp': 'image/webp',
+        'json': 'application/json',
+      };
+      const contentType = contentTypes[ext || ''] || 'application/octet-stream';
+      return new Response(file, {
+        headers: { "Content-Type": contentType },
       });
     }
 
@@ -101,6 +123,92 @@ const server = Bun.serve({
             if (result) {
               ws.send(JSON.stringify({ type: "RENDER_RESULT", data: result }));
             }
+          }
+        }
+
+        if (msg.type === "CONVERT_SVG") {
+          const { svgContent, sceneId } = msg.data;
+
+          try {
+            const converted = convertSvgToScene(svgContent, sceneId || "converted");
+
+            // Store the converted components
+            clientScenes.set(ws, {
+              data: converted.data,
+              template: converted.template,
+              theme: converted.theme
+            });
+
+            // Send converted components to client
+            ws.send(JSON.stringify({
+              type: "SVG_CONVERTED",
+              data: converted
+            }));
+
+            // Render the scene
+            const result = tryRenderScene(ws);
+            if (result) {
+              ws.send(JSON.stringify({ type: "RENDER_RESULT", data: result }));
+            }
+          } catch (e) {
+            ws.send(JSON.stringify({ type: "ERROR", message: `SVG conversion failed: ${e}` }));
+          }
+        }
+
+        if (msg.type === "CREATE_SCENE") {
+          const { sceneId } = msg.data;
+          const newScene = createEmptyScene(sceneId);
+
+          clientScenes.set(ws, {
+            data: newScene.data,
+            template: newScene.template,
+            theme: newScene.theme
+          });
+
+          ws.send(JSON.stringify({
+            type: "SCENE_CREATED",
+            data: newScene
+          }));
+        }
+
+        if (msg.type === "ADD_DATA_ITEM") {
+          const { item } = msg.data as { item: DataItem };
+          const components = clientScenes.get(ws);
+
+          if (components && components.data) {
+            const added = addDataItemToScene(components.data, item);
+            ws.send(JSON.stringify({
+              type: "DATA_ITEM_ADDED",
+              data: { item: added, data: components.data }
+            }));
+
+            // Re-render if we have all components
+            const result = tryRenderScene(ws);
+            if (result) {
+              ws.send(JSON.stringify({ type: "RENDER_RESULT", data: result }));
+            }
+          } else {
+            ws.send(JSON.stringify({ type: "ERROR", message: "No scene data to add item to" }));
+          }
+        }
+
+        if (msg.type === "SAVE_SCENE") {
+          const { basePath } = msg.data;
+          const components = clientScenes.get(ws);
+
+          if (components && components.data && components.template && components.theme) {
+            const savedFiles = await saveSceneToFile(
+              components.data,
+              components.template,
+              components.theme,
+              basePath
+            );
+            ws.send(JSON.stringify({
+              type: "SCENE_SAVED",
+              data: savedFiles
+            }));
+          } else {
+            ws.send(JSON.stringify({ type: "ERROR", message: "Incomplete scene - cannot save" }));
           }
         }
 
