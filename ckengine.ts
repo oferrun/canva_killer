@@ -1,4 +1,4 @@
-import type { SceneData, Template, Theme, DataItem } from "./types";
+import type { SceneData, Template, Theme, DataItem, Color, Font, Element } from "./types";
 
 export function createEmptyScene(sceneId: string): { data: SceneData; template: Template; theme: Theme } {
   const data: SceneData = {
@@ -34,6 +34,21 @@ export function createEmptyScene(sceneId: string): { data: SceneData; template: 
 export function addDataItemToScene(data: SceneData, item: DataItem): DataItem {
   data.data_items.push(item);
   return item;
+}
+
+export function addColorToTheme(theme: Theme, color: Color): Color {
+  theme.color_palette.push(color);
+  return color;
+}
+
+export function addFontToTheme(theme: Theme, font: Font): Font {
+  theme.font_palette.push(font);
+  return font;
+}
+
+export function addElementToTemplate(template: Template, element: Element): Element {
+  template.elements.push(element);
+  return element;
 }
 
 export interface SceneFile {

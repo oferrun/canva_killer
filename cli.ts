@@ -1,4 +1,4 @@
-import { createEmptyScene, addDataItemToScene, saveSceneToFile } from "./ckengine";
+import { createEmptyScene, addDataItemToScene, addColorToTheme, addFontToTheme, addElementToTemplate, saveSceneToFile } from "./ckengine";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -14,7 +14,7 @@ async function main() {
       scene.template.canvas.height = 1748;
 
       // Add yellow to color palette (as fallback)
-      scene.theme.color_palette.push({
+      addColorToTheme(scene.theme, {
         id: "yellow",
         name: "Yellow",
         r: 255,
@@ -24,7 +24,7 @@ async function main() {
       });
 
       // Add names color (blue) to color palette
-      scene.theme.color_palette.push({
+      addColorToTheme(scene.theme, {
         id: "names",
         name: "Names",
         r: 0,
@@ -42,7 +42,7 @@ async function main() {
       });
 
       // Add background element that uses the data item image
-      scene.template.elements.push({
+      addElementToTemplate(scene.template, {
         element_id: "background",
         element_type: "data_item",
         data_item_id: "background_image",
@@ -55,7 +55,7 @@ async function main() {
       });
 
       // Add road image element (non-data item)
-      scene.template.elements.push({
+      addElementToTemplate(scene.template, {
         element_id: "road",
         element_type: "image",
         image_url: "road.png",
@@ -67,7 +67,7 @@ async function main() {
       });
 
       // Add aisle image element
-      scene.template.elements.push({
+      addElementToTemplate(scene.template, {
         element_id: "aisle",
         element_type: "image",
         image_url: "aisle.png",
@@ -79,7 +79,7 @@ async function main() {
       });
 
       // Add Dancing Script font to font palette
-      scene.theme.font_palette.push({
+      addFontToTheme(scene.theme, {
         font_id: "halimum",
         font_name: "Dancing Script",
         font_url: "https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap"
@@ -94,7 +94,7 @@ async function main() {
       });
 
       // Add names element connected to the data item
-      scene.template.elements.push({
+      addElementToTemplate(scene.template, {
         element_id: "names_element",
         element_type: "data_item",
         data_item_id: "names",
