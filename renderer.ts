@@ -44,12 +44,26 @@ function generateCSS(
 ): string {
   let css = '';
 
-  // Add font imports
-  const fontImports = theme.font_palette.map((font: Font) =>
-    `@import url('${font.font_url}');`
-  ).join('\n');
+  // Add font imports — @import rules first, then @font-face (CSS spec requirement)
+  const imports: string[] = [];
+  const fontFaces: string[] = [];
 
-  css += fontImports + '\n\n';
+  theme.font_palette.forEach((font: Font) => {
+    if (font.font_url.startsWith('http')) {
+      imports.push(`@import url('${font.font_url}');`);
+    } else {
+      const ext = font.font_url.split('.').pop()?.toLowerCase() || 'otf';
+      const formatMap: Record<string, string> = {
+        otf: 'opentype', ttf: 'truetype', woff: 'woff', woff2: 'woff2'
+      };
+      const format = formatMap[ext] || 'opentype';
+      fontFaces.push(`@font-face {\n  font-family: '${font.font_name}';\n  src: url('${font.font_url}') format('${format}');\n}`);
+    }
+  });
+
+  if (imports.length > 0) css += imports.join('\n') + '\n';
+  if (fontFaces.length > 0) css += fontFaces.join('\n') + '\n';
+  css += '\n';
 
   // Add root container styles
   css += `.scene-container {

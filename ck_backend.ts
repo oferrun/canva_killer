@@ -103,7 +103,7 @@ export interface ReplicatePrediction {
   [key: string]: unknown;
 }
 
-export async function runNanoBanana(
+export async function runReplicateImageCreator(
   prompt: string,
   inputImages?: string[],
   aspectRatio?: string,
@@ -115,16 +115,19 @@ export async function runNanoBanana(
   }
 
   // Create prediction
-  const createResponse = await fetch("https://api.replicate.com/v1/models/google/nano-banana/predictions", {
+  //const createResponse = await fetch("https://api.replicate.com/v1/models/google/nano-banana/predictions", {
+  //const createResponse = await fetch("https://api.replicate.com/v1/models/black-forest-labs/flux-2-klein-9b/predictions", {
+  const createResponse = await fetch("https://api.replicate.com/v1/models/black-forest-labs/flux-2-klein-4b/predictions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${apiKey}`
     },
+    // for nano banana input images key is "image_input"
     body: JSON.stringify({
       input: {
         prompt,
-        input_images: inputImages,
+        images: inputImages,
         aspect_ratio: aspectRatio,
         output_format: outputFormat
       }
@@ -158,7 +161,7 @@ export async function runNanoBanana(
   }
 
   if (result.status === "failed") {
-    throw new Error("Nano Banana prediction failed");
+    throw new Error("Model prediction failed");
   }
 
   return result;

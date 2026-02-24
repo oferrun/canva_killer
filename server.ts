@@ -3,6 +3,7 @@ import { convertSvgToScene } from "./svg-converter";
 import { createEmptyScene, addDataItemToScene, saveSceneToFile } from "./ckengine";
 import { callGrokCompletionMultiTurn, type ChatMessage } from "./ck_backend";
 import type { Scene, SceneData, Template, Theme, DataItem } from "./types";
+import { executeOperations } from "./operation-executor";
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
@@ -23,9 +24,26 @@ RULES:
 5. When referencing outputs from previous operations (e.g., a generated image), use a placeholder like "$output_of_step_N" where N is the step number.
 6. Layer names should be descriptive (e.g., "background_photo", "title_text", "logo").
 7. When the user provides an input image or wants to create something based on an image, DEDUCE the canvas size from that image — do NOT ask the user for canvas dimensions. Just match the canvas to the image size. If no image is involved, pick a sensible default based on the use case (e.g., 1080x1080 for social media, 1080x1920 for stories, 1240x1748 for invitations).
-10. In add_image_layer, the default width and height is the image's own width and height — do NOT set width/height parameters unless the user wants to resize or reposition the image.
-8. Default canvas background color is always "#FFFFFF" (white) unless the user specifies otherwise.
-9. Default DPI is 72 (screen) unless the user mentions printing.
+8. In add_image_layer, the default width and height is the image's own width and height — do NOT set width/height parameters unless the user wants to resize or reposition the image.
+9. Default canvas background color is always "#FFFFFF" (white) unless the user specifies otherwise.
+10. Default DPI is 72 (screen) unless the user mentions printing.
+11. POSITIONING RULES FOR TEXT:
+    - By default, text layers are automatically centered (both horizontally and vertically). DO NOT include x, y parameters unless the user explicitly specifies a position.
+    - If the user wants text in a specific location (e.g., "top center", "bottom left"), use the "anchor" parameter instead of x/y coordinates.
+    - Valid anchor values: "center", "top-left", "top-center", "top-right", "center-left", "center-right", "bottom-left", "bottom-center", "bottom-right"
+    - NEVER calculate x/y pixel positions for centering — the system handles this automatically.
+    - Only use x/y when the user gives you specific pixel coordinates (e.g., "put text at position 100, 200").
+    - **For multiple related text items** (e.g., name, date, time, RSVP on an invitation), use flex containers to lay them out properly:
+      * Create a flex container with direction="column" (for vertical stacking) or direction="row" (for horizontal)
+      * Add each text layer WITHOUT positioning parameters
+      * Use "add_layer_to_container" to add each text to the container
+      * Use "set_layer_anchor" on the container to position the entire group
+      * DO NOT manually position each text item with separate x/y coordinates
+    - Examples:
+      * User: "Add title text 'Hello'" → {"operation": "add_text_layer", "parameters": {"text": "Hello", ...}} (no x/y/anchor = auto-centered)
+      * User: "Add text at the top" → {"operation": "add_text_layer", "parameters": {"text": "...", "anchor": "top-center"}}
+      * User: "Put text at coordinates 50, 100" → {"operation": "add_text_layer", "parameters": {"text": "...", "x": 50, "y": 100}}
+      * User: "Add name, date, and time" → create_flex_container + add_text_layer (3 times) + add_layer_to_container (3 times) + set_layer_anchor on container
 
 RESPONSE FORMAT:
 You MUST respond with valid JSON in one of these formats:
@@ -152,6 +170,33 @@ const server = Bun.serve({
       });
     }
 
+    // Render scene endpoint (for live preview updates)
+    if (url.pathname === "/render-scene" && req.method === "POST") {
+      try {
+        const body = await req.json() as any;
+        const { data, template, theme } = body;
+
+        if (!data || !template || !theme) {
+          return new Response(JSON.stringify({ error: "Missing scene data" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" }
+          });
+        }
+
+        const scene: Scene = { data, template, theme };
+        const rendered = renderScene(scene);
+
+        return new Response(JSON.stringify(rendered), {
+          headers: { "Content-Type": "application/json" }
+        });
+      } catch (error: any) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+    }
+
     // Serve static files (images, etc.)
     const filePath = url.pathname.slice(1); // Remove leading slash
     const file = Bun.file(filePath);
@@ -165,6 +210,10 @@ const server = Bun.serve({
         'svg': 'image/svg+xml',
         'webp': 'image/webp',
         'json': 'application/json',
+        'otf': 'font/otf',
+        'ttf': 'font/ttf',
+        'woff': 'font/woff',
+        'woff2': 'font/woff2',
       };
       const contentType = contentTypes[ext || ''] || 'application/octet-stream';
       return new Response(file, {
@@ -282,6 +331,29 @@ const server = Bun.serve({
               console.error("Grok API error:", e);
               ws.send(JSON.stringify({ type: "ASSISTANT_RESPONSE", data: { type: "message", text: "Sorry, I encountered an error. Please try again." } }));
             }
+          }
+
+          if (msg.type === "EXECUTE_OPERATIONS") {
+            const { sceneId, sceneName, operations } = msg.data;
+
+            if (!sceneId || !sceneName || !operations || !Array.isArray(operations)) {
+              ws.send(JSON.stringify({
+                type: "EXECUTION_FAILED",
+                data: {
+                  type: "failed",
+                  step: 0,
+                  operation: "validation",
+                  error: "Invalid request: sceneId, sceneName, and operations array are required"
+                }
+              }));
+              return;
+            }
+
+            // Execute operations asynchronously
+            // The executeOperations function will send progress updates and completion/failure messages
+            executeOperations(ws, sceneId, sceneName, operations).catch(error => {
+              console.error("Execution error:", error);
+            });
           }
         } catch (e) {
           console.error("Assistant message error:", e);

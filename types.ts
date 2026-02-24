@@ -45,6 +45,10 @@ export interface ElementStyle {
   margin_right?: string;
   padding?: string;
   display?: string;
+  flex_direction?: string;
+  justify_content?: string;
+  align_items?: string;
+  gap?: string;
 
   // Positioning
   position?: string;
@@ -63,6 +67,8 @@ export interface ElementStyle {
   line_height?: string;
   letter_spacing?: string;
   text_transform?: string;
+  text_shadow?: string;
+  transform?: string;
 
   // Colors
   color?: string;  // References color id from theme

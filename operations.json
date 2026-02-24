@@ -395,13 +395,32 @@
           {
             "name": "x",
             "type": "number",
-            "description": "Horizontal position of the text anchor point in pixels.",
-            "default": 0
+            "description": "Horizontal position in pixels. ONLY use this when the user provides specific pixel coordinates. DO NOT use for centering - text is centered by default when x/y/anchor are omitted.",
+            "default": null
           },
           {
             "name": "y",
             "type": "number",
-            "description": "Vertical position of the text anchor point in pixels.",
+            "description": "Vertical position in pixels. ONLY use this when the user provides specific pixel coordinates. DO NOT use for centering - text is centered by default when x/y/anchor are omitted.",
+            "default": null
+          },
+          {
+            "name": "anchor",
+            "type": "string",
+            "description": "Position text using semantic anchor points instead of x/y coordinates. When specified, x and y are ignored. Valid values: 'center', 'top-left', 'top-center', 'top-right', 'center-left', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right'.",
+            "valid_values": ["top-left", "top-center", "top-right", "center-left", "center", "center-right", "bottom-left", "bottom-center", "bottom-right"],
+            "default": null
+          },
+          {
+            "name": "offset_x",
+            "type": "number",
+            "description": "Horizontal offset from anchor point in pixels (positive = right). Only used with anchor parameter.",
+            "default": 0
+          },
+          {
+            "name": "offset_y",
+            "type": "number",
+            "description": "Vertical offset from anchor point in pixels (positive = down). Only used with anchor parameter.",
             "default": 0
           },
           {
