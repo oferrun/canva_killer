@@ -430,6 +430,38 @@
       }
     }
 
+    function scalePreviewToFit() {
+      const iframe = document.getElementById('previewFrame');
+      if (!iframe) return;
+
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      const container = doc.querySelector('.scene-container');
+      if (!container) return;
+
+      const sceneWidth = container.offsetWidth;
+      const sceneHeight = container.offsetHeight;
+
+      iframe.style.width = sceneWidth + 'px';
+      iframe.style.height = sceneHeight + 'px';
+
+      const centerPanel = document.querySelector('.center-panel');
+      const availableHeight = centerPanel.clientHeight - 40;
+      const availableWidth = centerPanel.clientWidth - 40;
+
+      const scaleY = availableHeight / sceneHeight;
+      const scaleX = availableWidth / sceneWidth;
+      const scale = Math.min(scaleX, scaleY, 1); // Don't scale up, only down
+
+      previewContainer.style.width = sceneWidth + 'px';
+      previewContainer.style.height = sceneHeight + 'px';
+      previewContainer.style.transform = `scale(${scale})`;
+
+      // Use negative margins so the layout size matches the visual (scaled) size
+      const marginX = (sceneWidth * (1 - scale)) / -2;
+      const marginY = (sceneHeight * (1 - scale)) / -2;
+      previewContainer.style.margin = `${marginY}px ${marginX}px`;
+    }
+
     function updatePreview(html, css) {
       previewContainer.classList.remove('empty');
       previewContainer.innerHTML = '';
@@ -454,51 +486,11 @@
       doc.write(fullHtml);
       doc.close();
 
-      setTimeout(() => {
-        const container = doc.querySelector('.scene-container');
-        if (container) {
-          const sceneWidth = container.offsetWidth;
-          const sceneHeight = container.offsetHeight;
-
-          iframe.style.width = sceneWidth + 'px';
-          iframe.style.height = sceneHeight + 'px';
-
-          // Scale to fit window height
-          const centerPanel = document.querySelector('.center-panel');
-          const availableHeight = centerPanel.clientHeight - 40; // 40px for padding
-          const availableWidth = centerPanel.clientWidth - 40;
-
-          const scaleY = availableHeight / sceneHeight;
-          const scaleX = availableWidth / sceneWidth;
-          const scale = Math.min(scaleX, scaleY, 1); // Don't scale up, only down
-
-          previewContainer.style.transform = `scale(${scale})`;
-        }
-      }, 100);
+      setTimeout(scalePreviewToFit, 100);
     }
 
     // Re-scale preview on window resize
-    window.addEventListener('resize', () => {
-      const iframe = document.getElementById('previewFrame');
-      if (iframe) {
-        const doc = iframe.contentDocument || iframe.contentWindow.document;
-        const container = doc.querySelector('.scene-container');
-        if (container) {
-          const sceneWidth = container.offsetWidth;
-          const sceneHeight = container.offsetHeight;
-
-          const centerPanel = document.querySelector('.center-panel');
-          const availableHeight = centerPanel.clientHeight - 40;
-          const availableWidth = centerPanel.clientWidth - 40;
-
-          const scaleY = availableHeight / sceneHeight;
-          const scaleX = availableWidth / sceneWidth;
-          const scale = Math.min(scaleX, scaleY, 1);
-
-          previewContainer.style.transform = `scale(${scale})`;
-        }
-      }
-    });
+    window.addEventListener('resize', scalePreviewToFit);
 
     function updateComponentDisplay(type, data, filename) {
       const dropZone = componentDropZones[type];
